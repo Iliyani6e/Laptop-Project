@@ -1,16 +1,27 @@
 //fs is a node package that allows us to read files from the file system
 const fs = require("fs");
-
 const http = require("http");
+const url = require("url");
 
-console.log(__dirname);
 //Read the data.json file.The
 const json = fs.readFileSync(`${__dirname}/data/data.json`, `utf-8`);
-
 const laptopData = JSON.parse(json);
 
 const server = http.createServer((req, res) => {
-  console.log(`Someone did access the server!`);
+  const pathName = url.parse(req.url, true).pathname;
+  const id = url.parse(req.url, true).query.id;
+  console.log(url.parse(req.url, true).query.id);
+
+  if (pathName === "/products" || pathName === "/") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    res.end("This is the PRODUCTS page!");
+  } else if (pathName === "/laptop" && id < laptopData.length) {
+    res.writeHead(200, { "Content-type": "text/html" });
+    res.end(`This is the LAPTOP page number ${id}!!!`);
+  } else {
+    res.writeHead(404, { "Content-type": "text/html" });
+    res.end("NOT FOUND!!!");
+  }
 });
 
 server.listen(5000, `127.0.0.1`, () => {
